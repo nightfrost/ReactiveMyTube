@@ -1,0 +1,41 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'io.nightfrost'
+version = '1.0.0'
+
+java {
+	sourceCompatibility = '21'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.projectlombok:lombok'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-jetty'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
