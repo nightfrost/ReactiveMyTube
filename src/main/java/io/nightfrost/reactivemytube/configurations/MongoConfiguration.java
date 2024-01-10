@@ -27,7 +27,7 @@ public class MongoConfiguration extends AbstractReactiveMongoConfiguration {
     @Override
     @Bean
     public MongoClient reactiveMongoClient() {
-        return MongoClients.create("mongodb://localhost:27017");
+        return MongoClients.create("mongodb://mytubesystem:MyTubeSystem123!@localhost:27017/mytubedb?authSource=mytubedb&authMechanism=SCRAM-SHA-256");
     }
 
     @Bean

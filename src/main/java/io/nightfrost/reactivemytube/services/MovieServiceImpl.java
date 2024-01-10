@@ -32,7 +32,6 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-
     public Flux<Void> getMovie(String id, ServerWebExchange exchange) {
         return this.reactiveGridFsTemplate.findOne(query(where("_id").is(id)))
                 .log()

@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 public class PostProcessWebFilter implements WebFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PostProcessWebFilter.class);
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String applicationPath = exchange.getRequest().getPath().pathWithinApplication().value();

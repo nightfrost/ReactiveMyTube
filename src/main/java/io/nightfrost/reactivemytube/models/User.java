@@ -1,19 +1,16 @@
 package io.nightfrost.reactivemytube.models;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Document
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
+@Builder
 public class User {
 
     @Id
@@ -22,24 +19,22 @@ public class User {
     private String firstname;
 
     private String lastname;
-    @NotBlank
+
     private String username;
 
-    @NotBlank
     private String password;
 
-    @NotBlank
     private String email;
 
     private String phone;
 
-    private Date dob;
+    private LocalDate dob;
 
     private String nationality;
 
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
-    private Timestamp updatedAt;
+    private LocalDateTime updatedAt;
 
     private boolean enabled;
 }
