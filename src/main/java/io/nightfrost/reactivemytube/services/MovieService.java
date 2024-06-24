@@ -16,4 +16,8 @@ public interface MovieService {
     Flux<Void> getMovie(String id, ServerWebExchange exchange);
 
     Mono<List<MovieDTO>> getAllAvailableMovies(ServerWebExchange exchange);
+
+    Mono<Boolean> existsMovie(String id);
+
+    Mono<List<MovieDTO>> queryMovies(String query, ServerWebExchange exchange);
 }

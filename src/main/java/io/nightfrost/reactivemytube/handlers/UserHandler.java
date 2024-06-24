@@ -40,14 +40,14 @@ public class UserHandler {
         String id = request.pathVariable("id");
 
         return userService.getUserById(id)
-                .doOnSuccess(user -> LOGGER.info("User with id {} retrieved", user.getId()))
+                .doOnSuccess(user -> LOGGER.info("User with id {} retrieved", id))
                 .doOnError(exception -> LOGGER.error("User with id: " + id  +" not found", exception))
                 .flatMap(user -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(user)))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     public Mono<ServerResponse> createUser(ServerRequest request) {
-        return request.bodyToMono(User.class)
+        return request.bodyToMono(User.class) //TODO: make DTO
                 .flatMap(userService::saveUser)
                 .doOnSuccess(userSaved -> LOGGER.info("User saved with id: {}", userSaved.getId()))
                 .doOnError(e -> LOGGER.error("Error in save user method", e))

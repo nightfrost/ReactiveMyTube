@@ -1,5 +1,6 @@
 package io.nightfrost.reactivemytube.models;
 
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -7,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document
 @Data
@@ -20,6 +22,8 @@ public class User {
 
     private String lastname;
 
+    @NotNull
+    @NotBlank
     private String username;
 
     private String password;
@@ -35,6 +39,8 @@ public class User {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private List<String> likedMovies;
 
     private boolean enabled;
 }

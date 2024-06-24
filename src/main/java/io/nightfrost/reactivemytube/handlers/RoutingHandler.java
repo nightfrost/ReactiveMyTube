@@ -14,6 +14,8 @@ public class RoutingHandler {
 
     private static final String USER_API = "/api/v1/users";
 
+    private static final String COMMENT_API = "/api/v1/comments";
+
     private static final String ID = "/{id}";
 
     @Bean
@@ -24,11 +26,13 @@ public class RoutingHandler {
                 .andRoute(PUT(USER_API + ID).and(accept(MediaType.APPLICATION_JSON)), userHandler::updateUser)
                 .andRoute(DELETE(USER_API + ID), userHandler::deleteUser);
     }
-/*
-See MovieHandler
+
     @Bean
-    public RouterFunction<ServerResponse> movieRouter(MovieHandler movieHandler) {
-        return route(GET(MOVIE_API + ID), movieHandler::getMovie)
-                .andRoute(POST(MOVIE_API), movieHandler::putMovie);
-    }*/
+    public RouterFunction<ServerResponse> commentRouter(CommentHandler commentHandler) {
+        return route(GET(COMMENT_API + ID), commentHandler::getAllByMovieId)
+                .andRoute(POST(COMMENT_API).and(accept(MediaType.APPLICATION_JSON)), commentHandler::createComment)
+                .andRoute(GET(COMMENT_API + "/user" + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::getAllByUserId)
+                .andRoute(PUT(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::updateComment)
+                .andRoute(DELETE(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::deleteComment);
+    }
 }
