@@ -1,5 +1,6 @@
 package io.nightfrost.reactivemytube.services;
 
+import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Comment;
 import io.nightfrost.reactivemytube.repositories.CommentRepository;
 import org.bson.types.ObjectId;
@@ -19,17 +20,18 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<Comment> getCommentById(String id) {
-        return commentRepository.findById(id);
+        return commentRepository.findById(id).switchIfEmpty(Mono.error(new ResourceNotFoundException("Comment not found with id: " + id)));
     }
 
     @Override
     public Flux<Comment> getCommentsByMovieId(String movieId) {
-        return commentRepository.findAllByMovieId(movieId);
+        return commentRepository.findAllByMovieId(movieId)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no comments for video with id: " + movieId)));
     }
 
     @Override
     public Flux<Comment> getCommentsByUserId(String userId) {
-        return commentRepository.findAllByUserId(userId);
+        return commentRepository.findAllByUserId(userId).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no comment for user with id: " + userId)));
     }
 
     @Override
@@ -47,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findById(id).flatMap(comment -> {
             Comment temp = (Comment) HelperService.partialUpdate(comment, updatedComment);
             return commentRepository.save(temp);
-        });
+        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Couldn't update comment with id: " + id)));
     }
 
     @Override

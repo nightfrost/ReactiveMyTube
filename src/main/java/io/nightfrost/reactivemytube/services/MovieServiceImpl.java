@@ -2,6 +2,7 @@ package io.nightfrost.reactivemytube.services;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
+import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +36,8 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public Flux<Void> getMovie(String id, ServerWebExchange exchange) {
         return movieRepository.getResource(id)
-                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()));
+                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()))
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Movie not found with id: " + id)));
     }
 
     @Override
@@ -47,7 +49,7 @@ public class MovieServiceImpl implements MovieService{
                 availableMovies.add(new MovieDTO(file.getId().toString(), file.getFilename(), file.getUploadDate()));
             }
             return Mono.just(availableMovies);
-        });
+        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No movies found.")));
     }
 
     @Override
@@ -66,6 +68,6 @@ public class MovieServiceImpl implements MovieService{
                 }
             }
             return Mono.just(availableMovies);
-        });
+        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
     }
 }
