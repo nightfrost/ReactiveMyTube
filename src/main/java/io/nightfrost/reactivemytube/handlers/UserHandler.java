@@ -47,7 +47,7 @@ public class UserHandler {
     }
 
     public Mono<ServerResponse> createUser(ServerRequest request) {
-        return request.bodyToMono(User.class) //TODO: make DTO
+        return request.bodyToMono(User.class)
                 .flatMap(userService::saveUser)
                 .doOnSuccess(userSaved -> LOGGER.info("User saved with id: {}", userSaved.getId()))
                 .doOnError(e -> LOGGER.error("Error in save user method", e))

@@ -18,6 +18,12 @@ public class RoutingHandler {
 
     private static final String ID = "/{id}";
 
+    private static final String USER_STRING = "/user";
+
+    private static final String MOVIE_STRING = "/movie";
+
+    private static final String SPECIFIC_STRING = "/specific";
+
     @Bean
     public RouterFunction<ServerResponse> userRouter(UserHandler userHandler) {
         return route(GET(USER_API), userHandler::getAll)
@@ -29,10 +35,11 @@ public class RoutingHandler {
 
     @Bean
     public RouterFunction<ServerResponse> commentRouter(CommentHandler commentHandler) {
-        return route(GET(COMMENT_API + ID), commentHandler::getAllByMovieId)
+        return route(GET(COMMENT_API + MOVIE_STRING + ID), commentHandler::getAllByMovieId)
                 .andRoute(POST(COMMENT_API).and(accept(MediaType.APPLICATION_JSON)), commentHandler::createComment)
-                .andRoute(GET(COMMENT_API + "/user" + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::getAllByUserId)
+                .andRoute(GET(COMMENT_API + USER_STRING + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::getAllByUserId)
                 .andRoute(PUT(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::updateComment)
-                .andRoute(DELETE(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::deleteComment);
+                .andRoute(DELETE(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::deleteComment)
+                .andRoute(GET(COMMENT_API + SPECIFIC_STRING + ID), commentHandler::getCommentById);
     }
 }

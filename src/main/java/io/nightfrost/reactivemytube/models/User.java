@@ -36,6 +36,7 @@ public class User {
 
     private String nationality;
 
+    @NotNull
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

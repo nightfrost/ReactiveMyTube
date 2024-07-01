@@ -13,14 +13,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
 
-    private final MovieService movieService;
-
-    private final ReactiveMongoTemplate template;
-
-    public CommentServiceImpl(CommentRepository commentRepository, MovieService movieService, ReactiveMongoTemplate template) {
+    public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
-        this.movieService = movieService;
-        this.template = template;
     }
 
     @Override

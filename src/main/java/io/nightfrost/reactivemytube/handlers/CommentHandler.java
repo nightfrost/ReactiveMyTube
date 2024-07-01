@@ -54,6 +54,14 @@ public class CommentHandler {
         });
     }
 
+    public Mono<ServerResponse> getCommentById(ServerRequest request) {
+        String id = request.pathVariable("id");
+
+        return commentService.getCommentById(id)
+                .flatMap(comment -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(fromValue(comment)))
+                .switchIfEmpty(ServerResponse.noContent().build());
+    }
+
     public Mono<ServerResponse> createComment(ServerRequest request) {
         return request.bodyToMono(Comment.class)
                 .flatMap(commentService::saveComment)
