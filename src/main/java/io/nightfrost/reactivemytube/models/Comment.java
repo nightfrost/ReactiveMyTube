@@ -1,5 +1,7 @@
 package io.nightfrost.reactivemytube.models;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -15,10 +17,14 @@ public class Comment {
     @Id
     private String id;
 
+    @NotBlank
+    @Max(value = 256)
     private String message;
 
+    @NotBlank
     private String userId;
 
+    @NotBlank
     private String movieId;
 
     private LocalDateTime createdDate;

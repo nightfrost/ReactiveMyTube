@@ -13,6 +13,7 @@ import java.util.List;
 @Document
 @Data
 @Builder
+
 public class User {
 
     @Id
@@ -26,8 +27,10 @@ public class User {
     @NotBlank
     private String username;
 
+    @NotBlank
     private String password;
 
+    @NotBlank
     private String email;
 
     private String phone;
