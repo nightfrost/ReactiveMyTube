@@ -36,8 +36,7 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public Flux<Void> getMovie(String id, ServerWebExchange exchange) {
         return movieRepository.getResource(id)
-                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()))
-                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Movie not found with id: " + id)));
+                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()));
     }
 
     @Override

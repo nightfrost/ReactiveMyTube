@@ -1,6 +1,7 @@
 package io.nightfrost.reactivemytube.handlers;
 
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
+import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.services.MovieServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
