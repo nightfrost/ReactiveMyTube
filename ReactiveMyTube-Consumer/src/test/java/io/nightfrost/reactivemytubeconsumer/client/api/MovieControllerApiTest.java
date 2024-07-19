@@ -18,16 +18,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * API tests for MovieControllerApi
  */
-@Disabled
+
 public class MovieControllerApiTest {
 
     private final MovieControllerApi api = new MovieControllerApi();
@@ -40,25 +37,24 @@ public class MovieControllerApiTest {
      */
     @Test
     public void getAllAvailableMovies1Test()  {
-        // uncomment below to test the function
-        //String query = null;
-        //List<MovieDTO> response = api.getAllAvailableMovies1(query).collectList().block();
+        String query = "n";
+        List<MovieDTO> response = api.getAllAvailableMovies1(query).collectList().block();
 
-        // TODO: test validations
+        assert !Objects.requireNonNull(response).isEmpty();
+        response.stream().forEach(movieDTO -> {
+           assert movieDTO.getFilename() != null && !movieDTO.getFilename().isEmpty();
+        });
     }
-    
+
     /**
-     * 
      *
-     * 
+     *
+     *
      */
     @Test
     public void getMovieTest()  {
-        // uncomment below to test the function
-        //String id = null;
-        //api.getMovie(id).block();
-
-        // TODO: test validations
+        api.getMovie("668adb3ab9b443097ca6f9df").doOnError(error -> System.out.println(error.getMessage())).block();
+        assert true;
     }
     
     /**
@@ -67,11 +63,10 @@ public class MovieControllerApiTest {
      * 
      */
     @Test
+    @Disabled
     public void postMovieTest()  {
         // uncomment below to test the function
-        //Object response = api.postMovie().block();
-
-        // TODO: test validations
+        Object response = api.postMovie().block();
     }
     
 }
