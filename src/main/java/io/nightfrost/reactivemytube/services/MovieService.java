@@ -1,6 +1,7 @@
 package io.nightfrost.reactivemytube.services;
 
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
+import io.nightfrost.reactivemytube.models.Metadata;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.server.ServerWebExchange;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface MovieService {
 
-    Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts);
+    Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts, Metadata metadata);
 
     Flux<Void> getMovie(String id, ServerWebExchange exchange);
 
