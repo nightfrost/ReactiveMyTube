@@ -37,7 +37,7 @@ jobs:
       run: gradle --version
       
     - name: Build with Gradle
-      run: gradle clean check jar
+      run: ../gradlew clean check jar
 
   dependency-submission:
 
