@@ -37,7 +37,7 @@ jobs:
       run: gradle --version
       
     - name: Build with Gradle
-      run: gradle build
+      run: ../.gradlew build
 
   dependency-submission:
 
