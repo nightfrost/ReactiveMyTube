@@ -3,6 +3,7 @@ package io.nightfrost.reactivemytube.services;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
 import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
+import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -28,8 +29,8 @@ public class MovieServiceImpl implements MovieService{
     private final Logger logger = LoggerFactory.getLogger(MovieServiceImpl.class);
 
     @Override
-    public Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts) {
-        return movieRepository.store(fileParts)
+    public Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts, Metadata metadata) {
+        return movieRepository.store(fileParts, metadata)
                 .map((id) -> ResponseEntity.ok().body(Map.of("id", id.toHexString())));
     }
 
