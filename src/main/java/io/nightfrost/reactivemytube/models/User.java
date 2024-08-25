@@ -13,7 +13,6 @@ import java.util.List;
 @Document
 @Data
 @Builder
-
 public class User {
 
     @Id

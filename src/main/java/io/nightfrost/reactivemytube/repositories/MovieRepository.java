@@ -1,8 +1,10 @@
 package io.nightfrost.reactivemytube.repositories;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import io.nightfrost.reactivemytube.models.Metadata;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Meta;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsResource;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
@@ -21,8 +23,8 @@ public class MovieRepository {
 
     private final ReactiveGridFsTemplate reactiveGridFsTemplate;
 
-    public Mono<ObjectId> store(Mono<FilePart> filePartMono) {
-        return filePartMono.flatMap(part -> this.reactiveGridFsTemplate.store(part.content(), part.filename())).log();
+    public Mono<ObjectId> store(Mono<FilePart> filePartMono, Metadata metadata) {
+        return filePartMono.flatMap(part -> this.reactiveGridFsTemplate.store(part.content(), metadata.getName(), metadata)).log();
     }
 
     public Mono<ReactiveGridFsResource> getResource(String id) {
