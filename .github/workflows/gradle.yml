@@ -24,6 +24,9 @@ jobs:
     steps:
     - name: Setup Java JDK
       uses: actions/setup-java@v4.2.2
+      with:
+        java-version: '21'
+        distribution: 'temurin'
   
 
     - name: Setup Gradle
@@ -43,7 +46,7 @@ jobs:
       uses: actions/setup-java@v4.2.2
       with:
         java-version: '21'
-        distribution: 'OpenJDK'
+        distribution: 'temurin'
 
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
