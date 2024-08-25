@@ -28,14 +28,14 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
     - name: Gradle Wrapper Validation
       uses: gradle/wrapper-validation-action@v3.5.0
-          
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle
-
-    - name: Build with Gradle Wrapper
-      run: ./gradlew clean jar
+      
+    - name: Build with Gradle
+      run: ./gradlew check jar
 
   dependency-submission:
 
