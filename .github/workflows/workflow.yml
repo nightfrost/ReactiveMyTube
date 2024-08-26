@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: github
     permissions:
       contents: read
 
@@ -31,6 +31,9 @@ jobs:
 
     - name: Check gradle version
       run: ./gradlew --version
+
+    - name: mongo-action
+      uses: DigiPie/mongo-action@v2.0.1
 
     - name: Build with Gradle
       run: ./gradlew build
@@ -51,5 +54,8 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    - name: mongo-action
+      uses: DigiPie/mongo-action@v2.0.1
+      
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
