@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
 
@@ -28,11 +28,6 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 8.5
 
     - name: Check gradle version
       run: ./gradlew --version
@@ -47,6 +42,9 @@ jobs:
       contents: write
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
     - name: Setup Java JDK
       uses: actions/setup-java@v4.2.2
       with:
