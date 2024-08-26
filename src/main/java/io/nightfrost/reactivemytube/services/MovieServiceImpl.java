@@ -1,9 +1,11 @@
 package io.nightfrost.reactivemytube.services;
 
+import com.mongodb.Tag;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
 import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Metadata;
+import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -30,7 +33,8 @@ public class MovieServiceImpl implements MovieService{
 
     @Override
     public Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts, Metadata metadata) {
-        return movieRepository.store(fileParts, metadata)
+        return movieRepository.store(fileParts, metadata).doOnSuccess((id) -> logger.info("Successfully stored movie with given ID: " + id))
+                .doOnError((throwable) -> logger.error("Failed to store movie.", throwable))
                 .map((id) -> ResponseEntity.ok().body(Map.of("id", id.toHexString())));
     }
 
@@ -46,7 +50,7 @@ public class MovieServiceImpl implements MovieService{
 
         return movieRepository.findAll().flatMap(movieList -> {
             for (GridFSFile file : movieList) {
-                availableMovies.add(new MovieDTO(file.getId().toString(), file.getFilename(), file.getUploadDate()));
+                mapMovieToMovieDTO(availableMovies, file);
             }
             return Mono.just(availableMovies);
         }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No movies found.")));
@@ -64,10 +68,31 @@ public class MovieServiceImpl implements MovieService{
         return movieRepository.findAll().flatMap(movieList -> {
             for (GridFSFile file : movieList) {
                 if (file.getFilename().toLowerCase().contains(query.toLowerCase())) {
-                    availableMovies.add(new MovieDTO(file.getId().toString(), file.getFilename(), file.getUploadDate()));
+                    mapMovieToMovieDTO(availableMovies, file);
                 }
             }
             return Mono.just(availableMovies);
         }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
+    }
+
+    private void mapMovieToMovieDTO(List<MovieDTO> availableMovies, GridFSFile file) {
+        //If metadata not provided at creation, fill with data available.
+        if (file.getMetadata() != null) {
+            ArrayList<Tags> tags = file.getMetadata()
+                    .getList("tags", String.class)
+                    .stream()
+                    .map(Tags::valueOf)
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            availableMovies.add(MovieDTO.builder()
+                    ._id(file.getId().toString())
+                    .filename(file.getFilename())
+                    .tags(tags)
+                    .posterUrl(file.getMetadata().getString("posterUrl"))
+                    .build());
+        } else {
+            availableMovies.add(MovieDTO.builder()
+                    ._id(file.getId().toString()).filename(file.getFilename()).uploadDate(file.getUploadDate()).build());
+        }
     }
 }
