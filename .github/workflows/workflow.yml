@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: github
+    runs-on: ubuntu-latest
     permissions:
       contents: read
 
