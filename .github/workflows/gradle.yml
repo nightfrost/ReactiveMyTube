@@ -15,13 +15,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
-
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
     - name: Setup Java JDK
       uses: actions/setup-java@v4.2.2
       with:
@@ -32,12 +33,12 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         gradle-version: 8.5
-    
+
     - name: Check gradle version
-      run: gradle --version
-      
+      run: ./gradlew --version
+
     - name: Build with Gradle
-      run: gradle build
+      run: ./gradlew build
 
   dependency-submission:
 
