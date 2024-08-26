@@ -36,11 +36,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<Comment> saveComment(Comment newComment) {
-
-        if(ObjectId.isValid(newComment.getMovieId())) {
-            boolean movieExists;
-
-        }
         return commentRepository.save(newComment);
     }
 
