@@ -1,6 +1,5 @@
 package io.nightfrost.reactivemytube.services;
 
-import com.mongodb.Tag;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
 import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
@@ -8,14 +7,14 @@ import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +28,12 @@ public class MovieServiceImpl implements MovieService{
 
     private final MovieRepository movieRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(MovieServiceImpl.class);
+    private final Logger LOGGER = Loggers.getLogger(MovieServiceImpl.class);
 
     @Override
-    public Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts, Metadata metadata) {
-        return movieRepository.store(fileParts, metadata).doOnSuccess((id) -> logger.info("Successfully stored movie with given ID: " + id))
-                .doOnError((throwable) -> logger.error("Failed to store movie.", throwable))
+    public Mono<ResponseEntity<Map<String, String>>> putMovie(Mono<FilePart> fileParts, Metadata metadata) {
+        return movieRepository.store(fileParts, metadata).doOnSuccess((id) -> LOGGER.info("Successfully stored movie with given ID: " + id))
+                .doOnError((throwable) -> LOGGER.error("Failed to store movie.", throwable))
                 .map((id) -> ResponseEntity.ok().body(Map.of("id", id.toHexString())));
     }
 
@@ -73,6 +72,17 @@ public class MovieServiceImpl implements MovieService{
             }
             return Mono.just(availableMovies);
         }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<String>> deleteMovie(String id, ServerWebExchange exchange) {
+        return movieRepository.delete(id).doOnSuccess(success -> LOGGER.info("Movie has been deleted.")).doOnError(error -> LOGGER.error("Failed to delete movie.")).map(status -> {
+            if (status) {
+                return ResponseEntity.ok().body("Deleted movie with id: " + id);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        });
     }
 
     private void mapMovieToMovieDTO(List<MovieDTO> availableMovies, GridFSFile file) {

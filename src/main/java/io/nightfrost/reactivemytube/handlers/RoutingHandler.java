@@ -3,6 +3,7 @@ package io.nightfrost.reactivemytube.handlers;
 import io.nightfrost.reactivemytube.models.Comment;
 import io.nightfrost.reactivemytube.models.User;
 import io.nightfrost.reactivemytube.services.UserService;
+/*
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
+*/
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -41,13 +43,13 @@ public class RoutingHandler {
     private static final String SPECIFIC_STRING = "/specific";
 
     @Bean
-    @RouterOperations({
+    /*@RouterOperations({
             @RouterOperation(path = USER_API, beanClass = UserHandler.class, beanMethod = "getAll", method = RequestMethod.GET, operation = @Operation(operationId = "getAllUsers", method = "GET")),
             @RouterOperation(path = USER_API + ID, beanClass = UserHandler.class, beanMethod = "getUserById", method = RequestMethod.GET, operation = @Operation(operationId = "getUserById", method = "GET", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation(path = USER_API, beanClass = UserHandler.class, beanMethod = "createUser", method = RequestMethod.POST, operation = @Operation(operationId = "createUser", method = "POST", requestBody = @RequestBody(required = true, description = "User Form", content = @Content(schema = @Schema(implementation = User.class))))),
             @RouterOperation(path = USER_API + ID, beanClass = UserHandler.class, beanMethod = "updateUser", method = RequestMethod.PUT, operation = @Operation(operationId = "updateUser", method = "PUT", requestBody = @RequestBody(required = true, description = "User Form", content = @Content(schema = @Schema(implementation = User.class))), parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation( path = USER_API + ID, beanClass = UserHandler.class, beanMethod = "deleteUser", method = RequestMethod.DELETE, operation = @Operation(operationId = "deleteUser", method = "DELETE", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))}))
-    })
+    })*/
     public RouterFunction<ServerResponse> userRouter(UserHandler userHandler) {
         return route(GET(USER_API), userHandler::getAll)
                 .andRoute(POST(USER_API).and(accept(MediaType.APPLICATION_JSON)), userHandler::createUser)
@@ -57,14 +59,14 @@ public class RoutingHandler {
     }
 
     @Bean
-    @RouterOperations({
+    /*@RouterOperations({
             @RouterOperation(path = COMMENT_API + MOVIE_STRING + ID, beanClass = CommentHandler.class, beanMethod = "getAllByMovieId", method = RequestMethod.GET, operation = @Operation(operationId = "getAllByMovieId", method = "GET", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation(path = COMMENT_API + USER_STRING + ID, beanClass = CommentHandler.class, beanMethod = "getAllByUserId", method = RequestMethod.GET, operation = @Operation(operationId = "getAllByUserId", method = "GET", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation(path = COMMENT_API, beanClass = CommentHandler.class, beanMethod = "createComment", method = RequestMethod.POST, operation = @Operation(operationId = "createComment", method = "POST", requestBody = @RequestBody(required = true, description = "Comment Form", content = @Content(schema = @Schema(implementation = Comment.class))))),
             @RouterOperation(path = COMMENT_API + ID, beanClass = CommentHandler.class, beanMethod = "updateComment", method = RequestMethod.PUT, operation = @Operation(operationId = "updateComment", method = "PUT", requestBody = @RequestBody(required = true, description = "Comment Form", content = @Content(schema = @Schema(implementation = Comment.class))), parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation(path = COMMENT_API + SPECIFIC_STRING + ID, beanClass = CommentHandler.class, beanMethod = "getCommentById", method = RequestMethod.GET, operation = @Operation(operationId = "getCommentById", method = "GET", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))})),
             @RouterOperation(path = COMMENT_API + ID, beanClass = CommentHandler.class, beanMethod = "deleteComment", method = RequestMethod.DELETE, operation = @Operation(operationId = "deleteComment", method = "DELETE", parameters = { @Parameter(name = "id", in = ParameterIn.PATH, style = ParameterStyle.SIMPLE, required = true, schema = @Schema(implementation = String.class))}))
-    })
+    })*/
     public RouterFunction<ServerResponse> commentRouter(CommentHandler commentHandler) {
         return route(GET(COMMENT_API + MOVIE_STRING + ID), commentHandler::getAllByMovieId)
                 .andRoute(POST(COMMENT_API).and(accept(MediaType.APPLICATION_JSON)), commentHandler::createComment)

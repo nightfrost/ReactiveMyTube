@@ -6,8 +6,6 @@ import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.services.MovieServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -16,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 import reactor.util.function.Tuple4;
 
 import java.nio.charset.StandardCharsets;
@@ -32,10 +32,10 @@ public class MovieController {
 
     private final MovieServiceImpl movieService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MovieController.class);
+    private static final Logger LOGGER = Loggers.getLogger(MovieController.class);
 
     @PostMapping()
-    public Mono<ResponseEntity> postMovie (ServerWebExchange exchange) {
+    public Mono<ResponseEntity<Map<String, String>>> postMovie (ServerWebExchange exchange) {
         Mono<Tuple4<FilePart, String, String, ArrayList<Tags>>> extractedMetdata = extractMetadata(exchange);
 
         return extractedMetdata.flatMap(tuple -> {
@@ -72,6 +72,13 @@ public class MovieController {
         return movieService.queryMovies(query, exchange)
                 .doOnError(exception -> LOGGER.error("Retrieval of all movies failed, see stack: ", exception))
                 .doOnSuccess(response -> LOGGER.info("Retrieved all ({}) available movies.", response.size()));
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<String>> deleteMovie(@PathVariable String id, ServerWebExchange exchange) {
+        return movieService.deleteMovie(id, exchange)
+                .doOnError(error -> LOGGER.error("Movie has been deleted.", error))
+                .doOnSuccess(success -> LOGGER.info("Returned response with code " + success.getStatusCode() + " and content: " + success.getBody()));
     }
 
     private Mono<Tuple4<FilePart, String, String, ArrayList<Tags>>> extractMetadata (ServerWebExchange exchange) {
