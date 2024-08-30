@@ -46,6 +46,3 @@ Oliver
 * 1.0.0
     * Initial Release
 
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
