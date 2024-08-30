@@ -1,8 +1,9 @@
 package io.nightfrost.reactivemytube;
 
+/*
 import io.swagger.v3.oas.models.info.Info;
-import lombok.Value;
 import org.springdoc.core.models.GroupedOpenApi;
+ */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,13 +13,11 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class ReactiveMyTubeApplication {
 
-	@Autowired
-	private Environment environment;
-
 	public static void main(String[] args) {
 		SpringApplication.run(ReactiveMyTubeApplication.class, args);
 	}
 
+	/*
 	@Bean
 	public GroupedOpenApi employeesOpenApi() {
 		String[] paths = { "/api/v1/movies/**" };
@@ -44,6 +43,6 @@ public class ReactiveMyTubeApplication {
 				.addOpenApiCustomizer(openApi -> openApi.info(new Info().title("Comments API").version(environment.getProperty("springdoc.version"))))
 				.pathsToMatch(paths)
 				.build();
-	}
+	}*/
 
 }

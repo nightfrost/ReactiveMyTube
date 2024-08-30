@@ -9,10 +9,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MovieService {
 
-    Mono<ResponseEntity> putMovie(Mono<FilePart> fileParts, Metadata metadata);
+    Mono<ResponseEntity<Map<String, String>>> putMovie(Mono<FilePart> fileParts, Metadata metadata);
 
     Flux<Void> getMovie(String id, ServerWebExchange exchange);
 
@@ -21,4 +22,6 @@ public interface MovieService {
     Mono<Boolean> existsMovie(String id);
 
     Mono<List<MovieDTO>> queryMovies(String query, ServerWebExchange exchange);
+
+    Mono<ResponseEntity<String>> deleteMovie(String id, ServerWebExchange exchange);
 }
