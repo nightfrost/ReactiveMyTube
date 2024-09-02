@@ -1,6 +1,7 @@
 package io.nightfrost.reactivemytube.repositories;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
+import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.services.MovieServiceImpl;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,13 @@ public class MovieRepository {
     }
 
     public Mono<ReactiveGridFsResource> getResource(String id) {
+        exists(id).flatMap(exists -> {
+            if (!exists) {
+                return Mono.error(new ResourceNotFoundException("No content"));
+            }
+            return null;
+        });
+
         return this.reactiveGridFsTemplate.findOne(query(where("_id").is(id)))
                 .log(LOGGER)
                 .flatMap(reactiveGridFsTemplate::getResource);
@@ -46,7 +54,7 @@ public class MovieRepository {
     public Mono<Boolean> exists(String id) {
         return this.reactiveGridFsTemplate.findOne(query(where("_id").is(id)))
                 .log(LOGGER)
-                .flatMap(movie -> Mono.just(true)).defaultIfEmpty(false);
+                .flatMap(movie -> movie.getFilename().isBlank() ? Mono.just(true) : Mono.just(false));
     }
 
     public Mono<Boolean> delete(String id) {

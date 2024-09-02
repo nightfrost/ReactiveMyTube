@@ -7,6 +7,7 @@ import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public Flux<Void> getMovie(String id, ServerWebExchange exchange) {
         return movieRepository.getResource(id)
-                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()));
+                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream())).doOnError(Flux::error);
     }
 
     @Override

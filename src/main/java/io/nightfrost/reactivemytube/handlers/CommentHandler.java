@@ -24,6 +24,7 @@ public class CommentHandler {
 
     private final CommentService commentService;
 
+    //TODO: Should use paging.
     public Mono<ServerResponse> getAllByMovieId(ServerRequest request) {
         String id = request.pathVariable("id");
 
@@ -39,6 +40,7 @@ public class CommentHandler {
         });
     }
 
+    //TODO: Should use paging
     public Mono<ServerResponse> getAllByUserId(ServerRequest request) {
         String id = request.pathVariable("id");
 

@@ -2,8 +2,11 @@ package io.nightfrost.reactivemytube.filters;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MimeType;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -22,8 +25,10 @@ public class PostProcessWebFilter implements WebFilter {
 
         if (applicationPath.contains("movies/") && method.name().contentEquals("GET") && containsParams) {
             exchange.getResponse()
-                    .getHeaders().add("content-type", "video/mp4");
+                    .getHeaders().add(HttpHeaders.CONTENT_TYPE, String.valueOf(MediaType.asMediaType(MimeType.valueOf("video/mp4"))));
             LOGGER.info("headers added");
+        } else {
+            exchange.getResponse().getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         }
         return chain.filter(exchange);
     }
