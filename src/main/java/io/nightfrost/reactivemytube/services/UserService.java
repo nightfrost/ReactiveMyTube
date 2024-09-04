@@ -17,5 +17,5 @@ public interface UserService {
 
     Mono<ResponseEntity<User>> updateUser(String id, User updatedUser);
 
-    Mono<ResponseEntity<Boolean>> deleteUser(String id);
+    Mono<ResponseEntity<String>> deleteUser(String id);
 }
