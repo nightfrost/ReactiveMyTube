@@ -61,17 +61,17 @@ public class MovieController {
     }
 
     @GetMapping()
-    public Mono<List<MovieDTO>> getAllAvailableMovies(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> getAllAvailableMovies(ServerWebExchange exchange) {
         return movieService.getAllAvailableMovies(exchange)
                 .doOnError(exception -> LOGGER.error("Retrieval of all movies failed, see stack: ", exception))
-                .doOnSuccess(response -> LOGGER.info("Retrieved all ({}) available movies.", response.size()));
+                .doOnSuccess(response -> LOGGER.info("Retrieved all ({}) available movies.", response.getBody().size()));
     }
 
     @GetMapping(params = "query")
-    public Mono<List<MovieDTO>> queryMovies(@RequestParam String query, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> queryMovies(@RequestParam String query, ServerWebExchange exchange) {
         return movieService.queryMovies(query, exchange)
                 .doOnError(exception -> LOGGER.error("Retrieval of all movies failed, see stack: ", exception))
-                .doOnSuccess(response -> LOGGER.info("Retrieved all ({}) available movies.", response.size()));
+                .doOnSuccess(response -> LOGGER.info("Retrieved all ({}) available movies.", response.getBody().size()));
     }
 
     @DeleteMapping("/{id}")

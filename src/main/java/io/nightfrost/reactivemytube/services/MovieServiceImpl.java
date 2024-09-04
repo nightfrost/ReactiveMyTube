@@ -45,24 +45,26 @@ public class MovieServiceImpl implements MovieService{
     }
 
     @Override
-    public Mono<List<MovieDTO>> getAllAvailableMovies(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> getAllAvailableMovies(ServerWebExchange exchange) {
         List<MovieDTO> availableMovies = new ArrayList<>();
 
         return movieRepository.findAll().flatMap(movieList -> {
             for (GridFSFile file : movieList) {
                 mapMovieToMovieDTO(availableMovies, file);
             }
-            return Mono.just(availableMovies);
-        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No movies found.")));
+            return Mono.just(ResponseEntity.ok(availableMovies));
+        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No available movies.")));
     }
 
     @Override
-    public Mono<Boolean> existsMovie(String id) {
-        return movieRepository.exists(id);
+    public Mono<ResponseEntity<Boolean>> existsMovie(String id) {
+        return movieRepository.exists(id).map(result -> {
+            return result ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+        });
     }
 
     @Override
-    public Mono<List<MovieDTO>> queryMovies(String query, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> queryMovies(String query, ServerWebExchange exchange) {
         List<MovieDTO> availableMovies = new ArrayList<>();
 
         return movieRepository.findAll().flatMap(movieList -> {
@@ -71,7 +73,7 @@ public class MovieServiceImpl implements MovieService{
                     mapMovieToMovieDTO(availableMovies, file);
                 }
             }
-            return Mono.just(availableMovies);
+            return Mono.just(ResponseEntity.ok(availableMovies));
         }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
     }
 
@@ -87,8 +89,8 @@ public class MovieServiceImpl implements MovieService{
     }
 
     private void mapMovieToMovieDTO(List<MovieDTO> availableMovies, GridFSFile file) {
-        //If metadata not provided at creation, fill with data available.
         if (file.getMetadata() != null) {
+            LOGGER.warn("No Metadata at creation, filling with available data");
             ArrayList<Tags> tags = file.getMetadata()
                     .getList("tags", String.class)
                     .stream()

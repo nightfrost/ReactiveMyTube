@@ -1,18 +1,21 @@
 package io.nightfrost.reactivemytube.services;
 
 import io.nightfrost.reactivemytube.models.User;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public interface UserService {
 
-    Mono<User> getUserById(String id);
+    Mono<ResponseEntity<User>> getUserById(String id);
 
-    Flux<User> getUsers();
+    Mono<ResponseEntity<List<User>>> getUsers();
 
-    Mono<User> saveUser(User newUser);
+    Mono<ResponseEntity<User>> saveUser(User newUser);
 
-    Mono<User> updateUser(String id, User updatedUser);
+    Mono<ResponseEntity<User>> updateUser(String id, User updatedUser);
 
-    Mono<Void> deleteUser(String id);
+    Mono<ResponseEntity<Boolean>> deleteUser(String id);
 }

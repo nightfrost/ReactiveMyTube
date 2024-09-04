@@ -25,12 +25,12 @@ public class UserHandler {
     private final UserService userService;
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
-        return userService.getUsers().collectList().flatMap(users -> {
-            if (users.isEmpty()) {
+        return userService.getUsers().flatMap(users -> {
+            if (users.getBody() != null && users.getBody().isEmpty()) {
                 LOGGER.error("Found no users");
                 return ServerResponse.noContent().build();
             }
-            LOGGER.info("Found {} users", users.size());
+            LOGGER.info("Found {} users", users.getBody().size());
             return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                     .body(fromValue(users));
         });
@@ -49,9 +49,9 @@ public class UserHandler {
     public Mono<ServerResponse> createUser(ServerRequest request) {
         return request.bodyToMono(User.class)
                 .flatMap(userService::saveUser)
-                .doOnSuccess(userSaved -> LOGGER.info("User saved with id: {}", userSaved.getId()))
+                .doOnSuccess(userSaved -> LOGGER.info("User saved with id: {}", userSaved.getBody().getId()))
                 .doOnError(e -> LOGGER.error("Error in save user method", e))
-                .flatMap(user -> ServerResponse.created(getToUri(user)).bodyValue(user));
+                .flatMap(user -> ServerResponse.created(getToUri(user.getBody())).bodyValue(user));
     }
 
     public Mono<ServerResponse> updateUser(ServerRequest request) {
