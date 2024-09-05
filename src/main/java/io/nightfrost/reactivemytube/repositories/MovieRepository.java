@@ -6,6 +6,7 @@ import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.services.MovieServiceImpl;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsResource;
 import org.springframework.data.mongodb.gridfs.ReactiveGridFsTemplate;
@@ -49,6 +50,10 @@ public class MovieRepository {
         return this.reactiveGridFsTemplate.find(new Query())
                 .log(LOGGER)
                 .collectList();
+    }
+
+    public Mono<GridFSFile> findById(String id) {
+        return this.reactiveGridFsTemplate.findOne(query(where("_id").is(id)));
     }
 
     public Mono<Boolean> exists(String id) {
