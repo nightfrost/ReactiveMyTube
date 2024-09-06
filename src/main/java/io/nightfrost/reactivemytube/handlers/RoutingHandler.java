@@ -1,25 +1,9 @@
 package io.nightfrost.reactivemytube.handlers;
 
-import io.nightfrost.reactivemytube.models.Comment;
-import io.nightfrost.reactivemytube.models.User;
-import io.nightfrost.reactivemytube.services.UserService;
-/*
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.Explode;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import org.springdoc.core.annotations.RouterOperation;
-import org.springdoc.core.annotations.RouterOperations;
-*/
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
@@ -73,6 +57,6 @@ public class RoutingHandler {
                 .andRoute(GET(COMMENT_API + USER_STRING + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::getAllByUserId)
                 .andRoute(PUT(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::updateComment)
                 .andRoute(DELETE(COMMENT_API + ID).and(accept(MediaType.APPLICATION_JSON)), commentHandler::deleteComment)
-                .andRoute(GET(COMMENT_API + SPECIFIC_STRING + ID), commentHandler::getCommentById);
+                .andRoute(GET(COMMENT_API + ID), commentHandler::getCommentById);
     }
 }

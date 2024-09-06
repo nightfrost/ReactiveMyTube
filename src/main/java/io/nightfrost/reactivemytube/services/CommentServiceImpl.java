@@ -3,8 +3,6 @@ package io.nightfrost.reactivemytube.services;
 import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Comment;
 import io.nightfrost.reactivemytube.repositories.CommentRepository;
-import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

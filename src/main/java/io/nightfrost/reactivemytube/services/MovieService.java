@@ -17,11 +17,11 @@ public interface MovieService {
 
     Flux<Void> getMovie(String id, ServerWebExchange exchange);
 
-    Mono<List<MovieDTO>> getAllAvailableMovies(ServerWebExchange exchange);
+    Mono<ResponseEntity<List<MovieDTO>>> getAllAvailableMovies(ServerWebExchange exchange);
 
-    Mono<Boolean> existsMovie(String id);
+    Mono<ResponseEntity<Boolean>> existsMovie(String id);
 
-    Mono<List<MovieDTO>> queryMovies(String query, ServerWebExchange exchange);
+    Mono<ResponseEntity<List<MovieDTO>>> queryMovies(String query, ServerWebExchange exchange);
 
     Mono<ResponseEntity<String>> deleteMovie(String id, ServerWebExchange exchange);
 }

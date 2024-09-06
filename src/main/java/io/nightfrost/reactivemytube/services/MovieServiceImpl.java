@@ -2,11 +2,11 @@ package io.nightfrost.reactivemytube.services;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
-import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -40,28 +40,29 @@ public class MovieServiceImpl implements MovieService{
     @Override
     public Flux<Void> getMovie(String id, ServerWebExchange exchange) {
         return movieRepository.getResource(id)
-                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream()));
+                .flatMapMany(resource -> exchange.getResponse().writeWith(resource.getDownloadStream())).doOnError(Flux::error);
     }
 
     @Override
-    public Mono<List<MovieDTO>> getAllAvailableMovies(ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> getAllAvailableMovies(ServerWebExchange exchange) {
         List<MovieDTO> availableMovies = new ArrayList<>();
 
         return movieRepository.findAll().flatMap(movieList -> {
             for (GridFSFile file : movieList) {
                 mapMovieToMovieDTO(availableMovies, file);
             }
-            return Mono.just(availableMovies);
-        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No movies found.")));
+            return Mono.just(ResponseEntity.ok(availableMovies));
+        }).switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build()))
+                .onErrorResume(Mono::error);
     }
 
     @Override
-    public Mono<Boolean> existsMovie(String id) {
-        return movieRepository.exists(id);
+    public Mono<ResponseEntity<Boolean>> existsMovie(String id) {
+        return movieRepository.exists(id).map(result -> result ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @Override
-    public Mono<List<MovieDTO>> queryMovies(String query, ServerWebExchange exchange) {
+    public Mono<ResponseEntity<List<MovieDTO>>> queryMovies(String query, ServerWebExchange exchange) {
         List<MovieDTO> availableMovies = new ArrayList<>();
 
         return movieRepository.findAll().flatMap(movieList -> {
@@ -70,8 +71,9 @@ public class MovieServiceImpl implements MovieService{
                     mapMovieToMovieDTO(availableMovies, file);
                 }
             }
-            return Mono.just(availableMovies);
-        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
+            return Mono.just(ResponseEntity.ok(availableMovies));
+        }).switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build()))
+                .onErrorResume(Mono::error);
     }
 
     @Override
@@ -86,8 +88,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     private void mapMovieToMovieDTO(List<MovieDTO> availableMovies, GridFSFile file) {
-        //If metadata not provided at creation, fill with data available.
-        if (file.getMetadata() != null) {
+        if (file.getMetadata() != null && file.getMetadata().containsKey("posterUrl") && file.getMetadata().containsKey("tags")) {
             ArrayList<Tags> tags = file.getMetadata()
                     .getList("tags", String.class)
                     .stream()
@@ -101,6 +102,7 @@ public class MovieServiceImpl implements MovieService{
                     .posterUrl(file.getMetadata().getString("posterUrl"))
                     .build());
         } else {
+            LOGGER.warn("No Metadata at creation, filling with available data");
             availableMovies.add(MovieDTO.builder()
                     ._id(file.getId().toString()).filename(file.getFilename()).uploadDate(file.getUploadDate()).build());
         }
