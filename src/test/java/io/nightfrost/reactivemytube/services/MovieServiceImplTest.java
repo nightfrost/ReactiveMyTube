@@ -15,7 +15,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ReactiveMyTubeApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

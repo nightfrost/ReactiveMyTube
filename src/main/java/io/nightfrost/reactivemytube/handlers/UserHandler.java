@@ -3,19 +3,13 @@ package io.nightfrost.reactivemytube.handlers;
 import io.nightfrost.reactivemytube.models.User;
 import io.nightfrost.reactivemytube.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.util.Logger;
 import reactor.util.Loggers;
-
-import java.net.URI;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 

@@ -1,7 +1,6 @@
 package io.nightfrost.reactivemytube.handlers;
 
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
-import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.services.MovieServiceImpl;

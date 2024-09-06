@@ -2,7 +2,6 @@ package io.nightfrost.reactivemytube.services;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import io.nightfrost.reactivemytube.dtos.MovieDTO;
-import io.nightfrost.reactivemytube.exceptions.ResourceNotFoundException;
 import io.nightfrost.reactivemytube.models.Metadata;
 import io.nightfrost.reactivemytube.models.Tags;
 import io.nightfrost.reactivemytube.repositories.MovieRepository;
@@ -53,14 +52,13 @@ public class MovieServiceImpl implements MovieService{
                 mapMovieToMovieDTO(availableMovies, file);
             }
             return Mono.just(ResponseEntity.ok(availableMovies));
-        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("No available movies.")));
+        }).switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build()))
+                .onErrorResume(Mono::error);
     }
 
     @Override
     public Mono<ResponseEntity<Boolean>> existsMovie(String id) {
-        return movieRepository.exists(id).map(result -> {
-            return result ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
-        });
+        return movieRepository.exists(id).map(result -> result ? ResponseEntity.ok(result) : ResponseEntity.notFound().build());
     }
 
     @Override
@@ -74,7 +72,8 @@ public class MovieServiceImpl implements MovieService{
                 }
             }
             return Mono.just(ResponseEntity.ok(availableMovies));
-        }).switchIfEmpty(Mono.error(new ResourceNotFoundException("Found no movies with query: " + query)));
+        }).switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NO_CONTENT).build()))
+                .onErrorResume(Mono::error);
     }
 
     @Override
@@ -89,8 +88,7 @@ public class MovieServiceImpl implements MovieService{
     }
 
     private void mapMovieToMovieDTO(List<MovieDTO> availableMovies, GridFSFile file) {
-        if (file.getMetadata() != null) {
-            LOGGER.warn("No Metadata at creation, filling with available data");
+        if (file.getMetadata() != null && file.getMetadata().containsKey("posterUrl") && file.getMetadata().containsKey("tags")) {
             ArrayList<Tags> tags = file.getMetadata()
                     .getList("tags", String.class)
                     .stream()
@@ -104,6 +102,7 @@ public class MovieServiceImpl implements MovieService{
                     .posterUrl(file.getMetadata().getString("posterUrl"))
                     .build());
         } else {
+            LOGGER.warn("No Metadata at creation, filling with available data");
             availableMovies.add(MovieDTO.builder()
                     ._id(file.getId().toString()).filename(file.getFilename()).uploadDate(file.getUploadDate()).build());
         }
