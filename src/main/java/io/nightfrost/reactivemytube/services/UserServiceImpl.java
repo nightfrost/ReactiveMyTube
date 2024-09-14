@@ -5,6 +5,7 @@ import io.nightfrost.reactivemytube.repositories.UserRepository;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -19,11 +20,10 @@ public class UserServiceImpl implements UserService {
 
     private final Logger LOGGER = Loggers.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final ReactiveMongoTemplate template;
+    private PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, ReactiveMongoTemplate template) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.template = template;
     }
 
     @Override
@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<ResponseEntity<User>> saveUser(User newUser) {
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         return userRepository.save(newUser)
                 .flatMap(createdUser -> Mono.just(ResponseEntity.created(getToUri(createdUser)).body(createdUser)))
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()))
@@ -58,6 +59,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .flatMap(dbUser -> {
             User updatedDbUser = (User)HelperService.partialUpdate(dbUser, updatedUser);
+            if (updatedDbUser.getPassword() != null) updatedDbUser.setPassword(passwordEncoder.encode(updatedDbUser.getPassword()));
             return userRepository.save(updatedDbUser)
                     .flatMap(savedUser -> Mono.just(ResponseEntity.ok(savedUser)))
                     .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError().build()));

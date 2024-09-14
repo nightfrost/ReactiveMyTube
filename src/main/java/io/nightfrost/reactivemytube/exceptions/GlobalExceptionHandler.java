@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
 @Component
@@ -44,6 +45,11 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
             message = error.getMessage();
         } else if (error instanceof ValidationException) {
             status = HttpStatus.BAD_REQUEST;
+            message = error.getMessage();
+        } else if (error instanceof InvalidKeySpecException) {
+            status = HttpStatus.BAD_REQUEST;
+            message = error.getMessage();
+        } else if (error instanceof ConfigurationException) {
             message = error.getMessage();
         }
 

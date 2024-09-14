@@ -1,9 +1,16 @@
 package io.nightfrost.reactivemytube.handlers;
 
+import io.nightfrost.reactivemytube.auth.JwtTokenProvider;
+import io.nightfrost.reactivemytube.auth.models.AuthResponse;
+import io.nightfrost.reactivemytube.auth.models.LoginRequest;
 import io.nightfrost.reactivemytube.models.User;
 import io.nightfrost.reactivemytube.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -20,6 +27,8 @@ public class UserHandler {
     private static final Logger LOGGER = Loggers.getLogger(UserHandler.class);
 
     private final UserService userService;
+    private ReactiveAuthenticationManager authenticationManager;
+    private JwtTokenProvider jwtTokenProvider;
 
     public Mono<ServerResponse> getAll(ServerRequest request) {
         return userService.getUsers()
@@ -56,6 +65,24 @@ public class UserHandler {
                 .flatMap(this::mapEntityToServerResponse)
                 .log(LOGGER);
     }
+
+    public Mono<ServerResponse> login(ServerRequest request) {
+        return request.bodyToMono(LoginRequest.class)
+                .flatMap(loginRequest -> {
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    );
+                    return authenticationManager.authenticate(authentication)
+                            .map(auth -> {
+                                String token = jwtTokenProvider.generateToken(auth);
+                                return new AuthResponse(token);
+                            });
+                })
+                .flatMap(authResponse -> ServerResponse.ok().bodyValue(authResponse))
+                .onErrorResume(error -> ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
 
     private Mono<ServerResponse> mapEntityToServerResponse(ResponseEntity<?> entity) {
         return ServerResponse.status(entity.getStatusCode()).body(fromValue(entity));
