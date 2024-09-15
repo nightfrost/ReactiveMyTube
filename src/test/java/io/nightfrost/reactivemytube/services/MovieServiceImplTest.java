@@ -1,6 +1,8 @@
 package io.nightfrost.reactivemytube.services;
 
 import io.nightfrost.reactivemytube.ReactiveMyTubeApplication;
+import io.nightfrost.reactivemytube.auth.models.AuthResponse;
+import io.nightfrost.reactivemytube.auth.models.LoginRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -25,7 +29,11 @@ public class MovieServiceImplTest {
 
     private String movieId;
 
+    private String token;
+
     private static final String API_ROUTE = "api/v1/movies";
+
+    private static final String AUTH_ROUTE = "api/v1/auth/login";
 
     @BeforeEach
     public void getAvailableTestMovie() {
@@ -35,12 +43,21 @@ public class MovieServiceImplTest {
                 .filename("Never Give up your way")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM);
 
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("unittestusername");
+        loginRequest.setPassword("unittestpassword");
+
+        client.post().uri(AUTH_ROUTE).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(loginRequest)).exchange().expectStatus().isOk().expectBody(ResponseEntity.class).value(body -> {
+            //token = body.getTokenType().concat(body.getAccessToken());
+        });
+
         bodyBuilder.part("name", "Never give up your way");
         bodyBuilder.part("posterUrl", "http;//imagesource.example/example.jpg");
         bodyBuilder.part("tags", "Comedy, Horror");
 
         client.post().uri(API_ROUTE)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                 .exchange()
                 .expectStatus().isOk()

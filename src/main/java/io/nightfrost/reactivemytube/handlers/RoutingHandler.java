@@ -14,6 +14,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Component
 public class RoutingHandler {
 
+    private static final String BASE_PATH = "/mytube";
     private static final String USER_API = "/api/v1/users";
 
     private static final String AUTH_API = "/api/v1/auth";
@@ -25,6 +26,10 @@ public class RoutingHandler {
     private static final String USER_STRING = "/user";
 
     private static final String MOVIE_STRING = "/movie";
+
+    private static final String LOGIN_STRING = "/login";
+
+    private static final String RENEW_STRING = "/renew";
 
     private static final String SPECIFIC_STRING = "/specific";
 
@@ -45,8 +50,10 @@ public class RoutingHandler {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> authRouter(UserHandler userHandler) {
-        return route(POST(AUTH_API), userHandler::login);
+    public RouterFunction<ServerResponse> authRouter(AuthHandler authHandler) {
+        return route(POST(AUTH_API + LOGIN_STRING), authHandler::login)
+                .andRoute(POST(AUTH_API + RENEW_STRING), authHandler::renew)
+                .andRoute(GET(AUTH_API + USER_STRING + ID), authHandler::getRoles);
     }
 
     @Bean

@@ -31,8 +31,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.1'
 	implementation 'org.springframework.security:spring-security-core:6.3.3'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//If upgrading one jackson library, the rest must be updated as well. Check compatibility with jjwt impl.
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'

@@ -35,7 +35,9 @@ public class JwtTokenProvider {
     private int jwtExpiration;
 
     public String generateToken(Authentication authentication) {
+
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+        LOGGER.info("Generating token for " + userPrincipal.getUsername());
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
@@ -68,7 +70,7 @@ public class JwtTokenProvider {
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(jwtSecret.toCharArray(), jwtSalt.getBytes(), 65536, 256);
-            secretKeySpec = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+            secretKeySpec = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "HmacSHA256");
             return secretKeySpec;
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             if (e instanceof InvalidKeySpecException) throw new ValidationException(e.getMessage());

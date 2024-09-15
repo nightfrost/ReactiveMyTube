@@ -13,6 +13,8 @@ import reactor.util.Logger;
 import reactor.util.Loggers;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,10 +22,11 @@ public class UserServiceImpl implements UserService {
 
     private final Logger LOGGER = Loggers.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -48,6 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<ResponseEntity<User>> saveUser(User newUser) {
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        newUser.setRoles(List.of("USER", "ADMIN"));
         return userRepository.save(newUser)
                 .flatMap(createdUser -> Mono.just(ResponseEntity.created(getToUri(createdUser)).body(createdUser)))
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()))
