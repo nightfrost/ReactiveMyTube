@@ -47,8 +47,8 @@ public class MovieServiceImplTest {
         loginRequest.setUsername("unittestusername");
         loginRequest.setPassword("unittestpassword");
 
-        client.post().uri(AUTH_ROUTE).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(loginRequest)).exchange().expectStatus().isOk().expectBody(ResponseEntity.class).value(body -> {
-            //token = body.getTokenType().concat(body.getAccessToken());
+        client.post().uri(AUTH_ROUTE).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(loginRequest)).exchange().expectStatus().isOk().expectBody(AuthResponse.class).value(body -> {
+            token = body.getTokenType().concat(body.getAccessToken());
         });
 
         bodyBuilder.part("name", "Never give up your way");

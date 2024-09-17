@@ -1,5 +1,6 @@
 package io.nightfrost.reactivemytube.services;
 
+import io.nightfrost.reactivemytube.models.Roles;
 import io.nightfrost.reactivemytube.models.User;
 import io.nightfrost.reactivemytube.repositories.UserRepository;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -13,6 +14,7 @@ import reactor.util.Logger;
 import reactor.util.Loggers;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,10 +25,12 @@ public class UserServiceImpl implements UserService {
     private final Logger LOGGER = Loggers.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordValidatorService passwordValidatorService;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, PasswordValidatorService passwordValidatorService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passwordValidatorService = passwordValidatorService;
     }
 
     @Override
@@ -50,8 +54,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<ResponseEntity<User>> saveUser(User newUser) {
-        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        newUser.setRoles(List.of("USER", "ADMIN"));
+        validateCreateUserInput(newUser);
+        passwordValidatorService.validatePassword(newUser.getPassword()).flatMap(isValid -> {
+            //passwordValidator will throw exception given any validations fail.
+            if (isValid) newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+            return Mono.just(true);
+        });
+
         return userRepository.save(newUser)
                 .flatMap(createdUser -> Mono.just(ResponseEntity.created(getToUri(createdUser)).body(createdUser)))
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()))
@@ -62,11 +71,16 @@ public class UserServiceImpl implements UserService {
     public Mono<ResponseEntity<User>> updateUser(String id, User updatedUser) {
         return userRepository.findById(id)
                 .flatMap(dbUser -> {
-            User updatedDbUser = (User)HelperService.partialUpdate(dbUser, updatedUser);
-            if (updatedDbUser.getPassword() != null) updatedDbUser.setPassword(passwordEncoder.encode(updatedDbUser.getPassword()));
-            return userRepository.save(updatedDbUser)
-                    .flatMap(savedUser -> Mono.just(ResponseEntity.ok(savedUser)))
-                    .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError().build()));
+                    if (updatedUser.getPassword() != null) {
+                        passwordValidatorService.validatePassword(updatedUser.getPassword());
+                        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    }
+
+                    User updatedDbUser = (User)HelperService.partialUpdate(dbUser, updatedUser);
+
+                    return userRepository.save(updatedDbUser)
+                            .flatMap(savedUser -> Mono.just(ResponseEntity.ok(savedUser)))
+                            .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError().build()));
         })
                 .switchIfEmpty(Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build()))
                 .onErrorResume(error -> Mono.just(ResponseEntity.internalServerError().build()))
@@ -92,4 +106,10 @@ public class UserServiceImpl implements UserService {
                 .buildAndExpand(userSaved.getId()).toUri();
     }
 
+    private User validateCreateUserInput(User newUser) {
+        if (!newUser.isEnabled()) newUser.setEnabled(true);
+        if (newUser.getCreatedAt() == null) newUser.setCreatedAt(LocalDateTime.now());
+        if (newUser.getRoles() == null || newUser.getRoles().isEmpty()) newUser.setRoles(List.of(Roles.USER));
+        return newUser;
+    }
 }

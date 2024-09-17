@@ -36,7 +36,7 @@ public class SecurityConfiguration {
                         .pathMatchers("public/**").permitAll()
                         .pathMatchers("api/v1/auth/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyRole("USER", "ADMIN")
-                        .pathMatchers(HttpMethod.POST, "api/v1/users/**").hasAnyRole("USER", "ADMIN")
+                        .pathMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()//.hasAnyRole("USER", "ADMIN")
                         .pathMatchers(HttpMethod.PUT, "api/v1/users/**").hasAnyRole("USER", "ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "api/v1/users/**").hasAnyRole("USER", "ADMIN")
                         .pathMatchers("api/v1/admin/**").hasRole("ADMIN")

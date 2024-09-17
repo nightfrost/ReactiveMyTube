@@ -51,5 +51,5 @@ public class User {
     private boolean enabled;
 
     @NotEmpty
-    private List<String> roles;
+    private List<Roles> roles;
 }
