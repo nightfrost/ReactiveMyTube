@@ -2,6 +2,7 @@ package io.nightfrost.reactivemytube.configurations;
 
 import io.nightfrost.reactivemytube.auth.JwtAuthenticationConverter;
 import io.nightfrost.reactivemytube.auth.JwtTokenProvider;
+import io.nightfrost.reactivemytube.models.Roles;
 import io.nightfrost.reactivemytube.repositories.UserRepository;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +58,9 @@ public class SecurityConfiguration {
                 .map(user -> org.springframework.security.core.userdetails.User
                         .withUsername(user.getUsername())
                         .password(user.getPassword())
-                        .roles(user.getRoles().toArray(new String[0]))
+                        .roles(user.getRoles().stream()
+                                .map(Roles::name)
+                                .toArray(String[]::new))
                         .accountExpired(!user.isEnabled())
                         .credentialsExpired(!user.isEnabled())
                         .disabled(!user.isEnabled())

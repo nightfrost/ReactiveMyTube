@@ -1,5 +1,6 @@
 package io.nightfrost.reactivemytube.services;
 
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import io.nightfrost.reactivemytube.ReactiveMyTubeApplication;
 import io.nightfrost.reactivemytube.auth.models.AuthResponse;
 import io.nightfrost.reactivemytube.auth.models.LoginRequest;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
@@ -17,8 +19,11 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ReactiveMyTubeApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,6 +43,8 @@ public class MovieServiceImplTest {
     @BeforeEach
     public void getAvailableTestMovie() {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+        JacksonJsonProvider jsonProvider = new JacksonJsonProvider();
+        JacksonJsonParser jsonParser = new JacksonJsonParser();
 
         bodyBuilder.part("file", new ClassPathResource("movies/20131214_NEVER GIVE UP YOUR WAAAAAAAAAAAAY.mp4"))
                 .filename("Never Give up your way")
@@ -47,8 +54,11 @@ public class MovieServiceImplTest {
         loginRequest.setUsername("unittestusername");
         loginRequest.setPassword("unittestpassword");
 
-        client.post().uri(AUTH_ROUTE).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(loginRequest)).exchange().expectStatus().isOk().expectBody(AuthResponse.class).value(body -> {
-            token = body.getTokenType().concat(body.getAccessToken());
+        client.post().uri(AUTH_ROUTE).contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(loginRequest)).exchange().expectStatus().isOk().expectBody(Object.class).value(body -> {
+            String bodyAsJson = jsonProvider.toJson(body);
+            Map<String, Object> jsonMap = jsonParser.parseMap(bodyAsJson);
+            token = String.valueOf(jsonMap.get("token_type")).concat(String.valueOf(jsonMap.get("access_token")));
+            System.out.println(token);
         });
 
         bodyBuilder.part("name", "Never give up your way");
@@ -77,6 +87,7 @@ public class MovieServiceImplTest {
     @Test
     public void GivenMovieID_WhenGetMovieByID_ReturnStreamOfMovie() {
         client.get().uri(API_ROUTE + "/" + movieId)
+                .header(HttpHeaders.AUTHORIZATION, token)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType("video/mp4");
