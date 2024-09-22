@@ -41,7 +41,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpiration * 1000L))
+                .setExpiration(new Date((new Date()).getTime() + jwtExpiration * 1000))
                 .signWith(getKeyFromPassword())
                 .compact();
     }
